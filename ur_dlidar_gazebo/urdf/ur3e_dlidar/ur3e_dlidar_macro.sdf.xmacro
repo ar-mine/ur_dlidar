@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <!-- Include other files -->
+  <xacro_include_definition uri="file://dlidar.sdf.xmacro"/>
+
+  <!-- Pre-defined parameters -->
+  <xacro_define_property name="pi" value="3.1415926" />
+  <xacro_define_property name="d2r" value="0.0175" />
+  <xacro_define_property name="rad" value="0.031783" />
+  <xacro_define_property name="het" value="0.02" />
+  
+  <robot name="dlidar">
+    <!-- Base link -->
+    <link name="dlidar_base">
+      <!-- Offset the  base by half the lenght of the cylinder -->
+      <pose>0 0 0 0 0 0</pose>
+      <collision name="dlidar_base_collision">
+        <geometry>
+          <cylinder>
+            <radius>${rad}</radius>
+            <length>${het}</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <!-- The visual is mostly a copy of the collision -->
+      <visual name="dlidar_base_visual">
+        <geometry>
+          <cylinder>
+            <radius>${rad}</radius>
+            <length>${het}</length>
+          </cylinder>
+        </geometry>
+      </visual>
+    </link>
+
+    <xacro_macro name="dlidar_macro" i="0"/>
+    <xacro_macro name="dlidar_macro" i="1"/>
+    <xacro_macro name="dlidar_macro" i="2"/>
+    <xacro_macro name="dlidar_macro" i="3"/>
+    <xacro_macro name="dlidar_macro" i="4"/>
+    <xacro_macro name="dlidar_macro" i="5"/>
+    <xacro_macro name="dlidar_macro" i="6"/>
+    <xacro_macro name="dlidar_macro" i="7"/>
+    
+  </robot>
+</sdf>

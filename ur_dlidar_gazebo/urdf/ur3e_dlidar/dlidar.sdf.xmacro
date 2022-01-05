@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <!-- Pre-defined parameters -->
+  <xacro_define_property name="pi" value="3.1415926" />
+  <xacro_define_property name="d2r" value="0.0175" />
+  <xacro_define_property name="rad" value="0.031783" />
+  <xacro_define_property name="het" value="0.02" />
+
+   <!-- Macro definition -->
+  <xacro_define_macro name="dlidar_macro" params="i">
+  <!-- Give the base link a unique name -->
+  <link name="dlidar${int(i)}">
+    <!-- Vertically offset the top cylinder by the length of the bottom
+        cylinder and half the length of this cylinder. -->
+    <pose>${rad*cos(36*d2r*i)} ${rad*sin(36*d2r*i)} 0 0 0 ${36*d2r*i}</pose>
+    <collision name="dlidar${int(i)}_collision">
+      <geometry>
+        <box>
+          <size>0.001 0.002 0.004</size>
+        </box>
+      </geometry>
+    </collision>
+    <!-- The visual is mostly a copy of the collision -->
+    <visual name="dlidar${int(i)}_visual">
+      <geometry>
+        <box>
+          <size>0.002 0.002 0.004</size>
+        </box>
+      </geometry>
+    </visual>
+    <!-- The sensor -->
+    <sensor type="ray" name="dlidar${int(i)}_ray">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>         <!-- 是否可视化射线 -->
+      <update_rate>10</update_rate>       <!-- 测距频率 -->
+      <ray>
+        <scan>
+          <horizontal>   <!-- 水平方向 -->
+            <samples>10</samples>
+            <resolution>1</resolution> 
+            <min_angle>-${15*d2r}</min_angle>  <!-- 角度范围最小值 -15度 -->
+            <max_angle>${15*d2r}</max_angle>   <!-- 角度范围最大值 15度 -->
+          </horizontal>
+          <vertical>     <!-- 垂直方向 参数同上-->
+            <samples>10</samples>
+            <resolution>1</resolution> 
+            <min_angle>-${15*d2r}</min_angle> 
+            <max_angle>${15*d2r}</max_angle> 
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min>     <!-- 最小测距范围-->
+          <max>1.0</max>     <!-- 最大测距范围-->
+          <resolution>0.02</resolution>
+        </range>
+      </ray>
+      <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range${int(i)}">
+      <gaussianNoise>0.001</gaussianNoise>   <!-- 添加传感器噪声 -->   
+      <alwaysOn>true</alwaysOn>
+      <updateRate>10</updateRate>
+      <topicName>dlidar_data</topicName>        <!-- 发布数据的 Topic 名称 -->
+      <frameName>dlidar${int(i)}</frameName>   <!-- 对应的frame 名字 -->
+      <radiation>ultrasound</radiation>
+      <fov>0.5</fov>
+  </plugin>
+    </sensor>
+  </link>
+  <joint name ="dlidar${int(i)}_joints" type="fixed">
+    <parent>dlidar_base</parent>
+    <child>dlidar${int(i)}</child>
+    <pose>${rad*cos(36*d2r*i)} ${rad*sin(36*d2r*i)} 0 0 0 ${36*d2r*i}</pose>
+  </joint>
+  </xacro_define_macro>
+</sdf>

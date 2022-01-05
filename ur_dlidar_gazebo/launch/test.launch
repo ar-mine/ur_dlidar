@@ -1,0 +1,30 @@
+<launch>
+    <!-- 将 Urdf 文件的内容加载到参数服务器 -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find ur_dlidar_gazebo)/urdf/ur3e_dlidar/ur3e_dlidar_macro.urdf.xacro'"/>
+    
+    <!-- Robot state publisher -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="500" />
+        <param name="tf_prefix" value="" />
+        <remap from="/joint_states" to="/dlidar_gazebo/joint_states" />
+    </node>
+
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" >
+        <param name="use_gui" value="false"/>
+    </node>
+
+    <!-- Open Rviz -->
+    <node name="rviz" pkg="rviz" type="rviz"
+          respawn="false" output="screen" args="-d $(find ur_dlidar_gazebo)/config/vis.rviz" />
+
+    <!-- 启动 gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch"> 
+        <arg name="paused" value="true"/>
+    </include>
+
+    <!-- 在 gazebo 中显示机器人模型 -->
+    <node pkg="gazebo_ros" type="spawn_model" name="model" 
+          args="-urdf -model dlidar_gazebo -param robot_description"  />
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="dlidar_root" args="0 0 0 0 0 0 1 dlidar_base_link dlidar_base 100" /> -->
+</launch>

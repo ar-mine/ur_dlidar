@@ -1,0 +1,52 @@
+<sdf version='1.7'>
+  <model name='dlidar_gazebo'>
+    <link name='dlidar_base'>
+      <inertial>
+        <pose>0.015892 0 0 0 -0 0</pose>
+        <mass>12</mass>
+        <inertia>
+          <ixx>2</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.00303</iyy>
+          <iyz>0</iyz>
+          <izz>2.00303</izz>
+        </inertia>
+      </inertial>
+      <collision name='dlidar_base_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02</length>
+            <radius>0.031783</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='dlidar_base_fixed_joint_lump__dlidar0_collision_1'>
+        <pose>0.063566 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.001 0.002 0.004</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='dlidar_base_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02</length>
+            <radius>0.031783</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='dlidar_base_fixed_joint_lump__dlidar0_visual_1'>
+        <pose>0.063566 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.001 0.002 0.004</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
