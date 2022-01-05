@@ -17,10 +17,6 @@ wstool init .
 wstool merge -t . ur_dlidar/ur_dlidar.rosinstall
 wstool update -t .
 
-rosdep update
-sudo apt update
-sudo apt dist-upgrade
-
 # install dependencies
 $ sudo apt update -qq
 $ sudo apt dist-upgrade
