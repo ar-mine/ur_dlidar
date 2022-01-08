@@ -9,10 +9,7 @@ Panels:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /MotionPlanning1/Planning Metrics1
-        - /MarkerArray1/Status1
         - /MarkerArray1/Namespaces1
-        - /MarkerArray2/Status1
-        - /MarkerArray2/Namespaces1
       Splitter Ratio: 0.5
     Tree Height: 399
   - Class: rviz/Selection
@@ -402,15 +399,7 @@ Visualization Manager:
       Velocity_Scaling_Factor: 0.1
     - Class: rviz/MarkerArray
       Enabled: false
-      Marker Topic: /viz_pub
-      Name: MarkerArray
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: false
-    - Class: rviz/MarkerArray
-      Enabled: false
-      Marker Topic: /cls_pub
+      Marker Topic: /fcl/viz_pub
       Name: MarkerArray
       Namespaces:
         {}
@@ -444,7 +433,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.8063756227493286
+      Distance: 1.068969488143921
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -452,17 +441,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.28473931550979614
-        Y: 0.10925770550966263
-        Z: 0.5031797289848328
+        X: 0
+        Y: 0
+        Z: 0.5
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.224796175956726
+      Pitch: 1.0997967720031738
       Target Frame: <Fixed Frame>
-      Yaw: 3.0926551818847656
+      Yaw: 3.2218151092529297
     Saved: ~
 Window Geometry:
   Displays:

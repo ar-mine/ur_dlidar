@@ -98,4 +98,5 @@
     <param name="planning_scene_monitor/publish_transforms_updates" value="$(arg publish_monitored_planning_scene)" />
   </node>
 
+  <param name="move_group/trajectory_execution/allowed_execution_duration_scaling" value="5.0" />
 </launch>

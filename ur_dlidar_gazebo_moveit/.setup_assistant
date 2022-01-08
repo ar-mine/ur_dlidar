@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur_dlidar_gazebo
+    relative_path: urdf/ur_dlidar.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/ur_dlidar_robot_gazebo.srdf
+  CONFIG:
+    author_name: Armine
+    author_email: TANR0041@e.ntu.edu.sg
+    generated_timestamp: 1641616024

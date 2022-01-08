@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="dlidar_gazebo">
+  <!-- Include other files -->
+  <xacro:include filename="$(find ur_dlidar_gazebo)/urdf/ur3e_dlidar/dlidar.urdf.xacro"/>
+  <!-- Pre-defined parameters -->
+  <xacro:property name="d2r" value="0.0175"/>
+  <xacro:property name="rad" value="0.031783"/>
+  <xacro:property name="het" value="0.02"/>
+
+  <!-- World link -->
+  <link name="dlidar_base"/>
+  <joint name ="base_joint" type="fixed">
+    <parent link="dlidar_base"/>
+    <child link="dlidar_base_inertia"/>
+  </joint>
+  <!-- Base link with inertia-->
+  <link name="dlidar_base_inertia">
+    <!-- Visual -->
+    <visual>
+      <geometry>
+        <cylinder radius="${rad}" length="${het}"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <material name="black">
+          <color rgba="0.5 0.3 0.0 1" />
+      </material>
+    </visual>
+    <!-- Collision -->
+    <collision>
+      <geometry>
+        <cylinder radius="${rad}" length="${het}"/>
+      </geometry>
+    </collision>
+    <!-- Interial -->
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.001" />
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
+    </inertial>
+  </link>
+  
+  <!-- Sensor Links -->
+  <xacro:dlidar_macro i="0"/>
+  <xacro:dlidar_macro i="1"/>
+  <xacro:dlidar_macro i="2"/>
+  <xacro:dlidar_macro i="3"/>
+  <xacro:dlidar_macro i="4"/>
+  <xacro:dlidar_macro i="5"/>
+  <xacro:dlidar_macro i="6"/>
+  <xacro:dlidar_macro i="7"/>
+ </robot>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="rviz_gui" default="true" doc="Starts Rviz gui" />
+
+  <!-- Open Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz"
+      respawn="false" output="screen" args="-d $(find ur_dlidar_gazebo)/config/vis.rviz" if="$(arg rviz_gui)"/>
+
+</launch>

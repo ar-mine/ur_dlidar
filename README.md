@@ -21,6 +21,7 @@ wstool update -t .
 $ sudo apt update -qq
 $ sudo apt dist-upgrade
 $ rosdep update
+$ cd ..
 $ rosdep install --from-paths src --ignore-src -y
 
 # build the workspace
