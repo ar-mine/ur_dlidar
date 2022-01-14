@@ -1,5 +1,5 @@
 import rospy
-from move import MoveGroup
+from move_base import MoveGroup
 from helper_func import *
 from sensor_msgs.msg import Range
 from std_msgs.msg import Int8MultiArray

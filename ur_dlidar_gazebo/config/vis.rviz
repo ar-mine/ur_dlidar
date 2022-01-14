@@ -4,13 +4,17 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
         - /TF1/Frames1
+        - /TF1/Frames1/wrist_3_link1
+        - /TF1/Frames1/wrist_3_link1/Position1
+        - /TF1/Tree1
         - /MotionPlanning1/Scene Geometry1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /MotionPlanning1/Planning Metrics1
         - /MarkerArray1/Namespaces1
-      Splitter Ratio: 0.5
+      Splitter Ratio: 0.7121495604515076
     Tree Height: 399
   - Class: rviz/Selection
     Name: Selection
@@ -74,10 +78,58 @@ Visualization Manager:
       Value: false
       Visual Enabled: false
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base:
+          Value: true
+        base_link:
+          Value: false
+        base_link_inertia:
+          Value: false
+        dlidar0:
+          Value: false
+        dlidar1:
+          Value: false
+        dlidar2:
+          Value: false
+        dlidar3:
+          Value: false
+        dlidar4:
+          Value: false
+        dlidar5:
+          Value: false
+        dlidar6:
+          Value: false
+        dlidar7:
+          Value: false
+        dlidar_base:
+          Value: false
+        dlidar_base_inertia:
+          Value: false
+        flange:
+          Value: false
+        forearm_link:
+          Value: false
+        plane:
+          Value: false
+        shoulder_link:
+          Value: false
+        tool0:
+          Value: false
+        tool0_controller:
+          Value: true
+        upper_arm_link:
+          Value: false
+        world:
+          Value: false
+        wrist_1_link:
+          Value: false
+        wrist_2_link:
+          Value: false
+        wrist_3_link:
+          Value: true
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -85,16 +137,48 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        world:
+          plane:
+            base_link:
+              base:
+                tool0_controller:
+                  {}
+              base_link_inertia:
+                shoulder_link:
+                  upper_arm_link:
+                    forearm_link:
+                      wrist_1_link:
+                        wrist_2_link:
+                          wrist_3_link:
+                            flange:
+                              tool0:
+                                dlidar_base:
+                                  dlidar_base_inertia:
+                                    dlidar0:
+                                      {}
+                                    dlidar1:
+                                      {}
+                                    dlidar2:
+                                      {}
+                                    dlidar3:
+                                      {}
+                                    dlidar4:
+                                      {}
+                                    dlidar5:
+                                      {}
+                                    dlidar6:
+                                      {}
+                                    dlidar7:
+                                      {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Alpha: 0.5
       Buffer Length: 8
       Class: rviz/Range
       Color: 255; 255; 255
       Enabled: true
       Name: Range
-      Queue Size: 10
+      Queue Size: 20
       Topic: /dlidar_data
       Unreliable: false
       Value: true
@@ -398,13 +482,13 @@ Visualization Manager:
       Value: true
       Velocity_Scaling_Factor: 0.1
     - Class: rviz/MarkerArray
-      Enabled: false
-      Marker Topic: /fcl/viz_pub
+      Enabled: true
+      Marker Topic: /ProximityForce/viz_pub
       Name: MarkerArray
       Namespaces:
-        {}
+        force: true
       Queue Size: 100
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -433,7 +517,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.068969488143921
+      Distance: 2.288975954055786
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -441,29 +525,29 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0.5
+        X: 0.013439614325761795
+        Y: 0.03934098780155182
+        Z: 0.38750141859054565
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0997967720031738
+      Pitch: 0.7947975397109985
       Target Frame: <Fixed Frame>
-      Yaw: 3.2218151092529297
+      Yaw: 1.6986231803894043
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
   Height: 1016
   Hide Left Dock: false
-  Hide Right Dock: false
+  Hide Right Dock: true
   MotionPlanning:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002190000035afc020000000bfb0000001200530065006c0065006300740069006f006e000000003d0000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000001cc000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000020f000001880000017d00fffffffb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000001600000016000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007380000003efc0100000002fb0000000800540069006d0065010000000000000738000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004040000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002390000035afc020000000bfb0000001200530065006c0065006300740069006f006e000000003d0000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000001cc000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000020f000001880000017d00fffffffb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000001600000016000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000039c0000003efc0100000002fb0000000800540069006d006501000000000000039c000002eb00fffffffb0000000800540069006d006501000000000000045000000000000000000000015d0000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -471,7 +555,7 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Views:
-    collapsed: false
-  Width: 1848
-  X: 72
+    collapsed: true
+  Width: 924
+  X: 996
   Y: 27

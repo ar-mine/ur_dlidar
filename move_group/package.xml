@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>move_group</name>
+  <version>0.0.0</version>
+  <description>Python interfaces to MoveGroup of UR robot arm</description>
+
+  <author email="tanr0041@e.ntu.edu.sg">Armine</author>
+
+  <maintainer email="tanr0041@e.ntu.edu.sg">Armine</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_PYTHON_VERSION == 2">python-catkin-pkg</buildtool_depend>
+  <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-catkin-pkg</buildtool_depend>
+
+  <depend condition="$ROS_PYTHON_VERSION == 2">python</depend>
+  <depend condition="$ROS_PYTHON_VERSION == 3">python3</depend>
+
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>ur_msgs</exec_depend>
+  <exec_depend>shape_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>moveit_msgs</exec_depend>
+  <exec_depend>moveit_commander</exec_depend>
+  <exec_depend>rospy</exec_depend>
+
+</package>
