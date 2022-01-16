@@ -6,11 +6,11 @@ import tf.transformations as tft
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64, Float64MultiArray
 from moveit_msgs.srv import GetPositionIK, GetPositionIKRequest
-import roslib
-roslib.load_manifest("ur_kinematics")
 from helper_func import *
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from trajectory_msgs.msg import JointTrajectoryPoint
+from ur_ikfast import ur_kinematics
+
 
 JOINT_NAMES = [
     "shoulder_pan_joint",
@@ -35,22 +35,19 @@ class AdmittanceControl(MoveGroup):
         self.B = np.eye(6)*2.0
         self.K = np.eye(6)*1.5
 
-        # Init variables
-        # self.x_e_dot_dot = np.zeros((6,))
-        # self.x_e_dot = np.zeros((6,))
-        # self.x_e = np.zeros((6,))
-        self.F_e = np.zeros((6,))
-
         # Desired states
-        self.x_d = self.move_group_cmd.get_current_pose().pose
-        self.x_d_position, self.x_d_orientation = pose2pose(self.x_d)
+        self.x_d = np.zeros((6,))
         self.x_d_dot = np.zeros((6,))
 
         # Current states
-        self.x_n = self.move_group_cmd.get_current_pose().pose
+        self.x_n = np.zeros((6,))
         self.x_n_dot = np.zeros((6,))
         self.q_n = np.zeros((6,))
         self.q_n_dot = np.zeros((6,))
+        # The external force
+        self.F_e = np.zeros((6,))
+        # Jacobian
+        self.jacobian = np.zeros((6, 6))
 
         # Work parameter
         self.rate = None
@@ -61,9 +58,8 @@ class AdmittanceControl(MoveGroup):
 
         # Subscriber
         rospy.Subscriber("/joint_states", JointState, self._states_update_cb, queue_size=1)
-        self.ik_solver = rospy.ServiceProxy(
-            "/compute_ik", GetPositionIK
-        )
+        self.ur_kinematics = ur_kinematics.URKinematics('ur3e')
+
         if mode == 1:
             self.switch_controller("joint_group_pos_controller")
         elif mode == 2:
@@ -78,8 +74,9 @@ class AdmittanceControl(MoveGroup):
         rospy.sleep(2)
 
     def run(self):
-        self.rate = rospy.Rate(self.freq)
+        self.x_d = self.x_n
         joints = Float64MultiArray()
+        self.rate = rospy.Rate(self.freq)
         while not self.done:
             with self.lock:
                 x_e_dot = self.x_n_dot - self.x_d_dot
@@ -91,7 +88,7 @@ class AdmittanceControl(MoveGroup):
             x_e_next = poseOperation(x_e_dot_next/self.freq, x_e, mode=1)
             x_n_next = poseOperation(x_e_next, self.x_d, mode=1)
 
-            q_n_next = self._compute_ik(x_n_next)
+            q_n_next = self.ur_kinematics.inverse(x_n_next)
             if isinstance(q_n_next, type(None)):
                 rospy.loginfo("No solution")
                 continue
@@ -124,47 +121,42 @@ class AdmittanceControl(MoveGroup):
     def _states_update_cb(self, msg):
         if not self.done:
             with self.lock:
-                robot_state = self.move_group_cmd.get_current_state()
-
                 # Position
-                actual_joints = list(robot_state.joint_state.position)
-                self.q_n[:] = actual_joints
-                self.x_n = self.move_group_cmd.get_current_pose().pose
+                _position = msg.position
+                self.q_n[:] = [_position[2], _position[1], _position[0], *_position[3:]]
+                _x_n = self.ur_kinematics.forward(self.q_n)
+                self.x_n[:] = [*_x_n[:3], *tft.euler_from_quaternion(_x_n[3:])]
+
+                # Jacobian
+                self.jacobian[:] = self._compute_jacobian()
 
                 # Velocity
-                actual_speed = robot_state.joint_state.velocity
-                if len(actual_speed) == 0:
-                    actual_speed = [0] * 6
-                self.q_n_dot[:] = actual_speed
-                self.jacobian = self.move_group_cmd.get_jacobian_matrix(actual_joints)
+                _velocity = msg.velocity
+                self.q_n_dot[:] = [_velocity[2], _velocity[1], _velocity[0], *_velocity[3:]]
                 self.x_n_dot[:] = np.dot(self.jacobian, self.q_n_dot)
 
     def set_callback(self, callback):
         self.callback = callback
 
-    def _compute_ik(self, pose):
-        if isinstance(pose, Pose):
-            pose_quat = pose
-        else:
-            pose_quat = list2Pose(pose[:3], tft.quaternion_from_euler(*pose[3:]))
+    def _compute_jacobian(self, delta=0.05):
+        t_n = self.ur_kinematics.forward(self.q_n, 'matrix')
+        delta_q = delta/180*np.pi
+        q_n_delta = self.q_n + delta_q
 
-        req = GetPositionIKRequest()
-        req.ik_request.ik_link_name = "wrist_3_link"
-        req.ik_request.group_name = self.group_name
+        jacobian = np.zeros((6, 6))
+        for i in range(6):
+            q_n_next = self.q_n
+            q_n_next[i] = q_n_delta[i]
+            t_n_next = self.ur_kinematics.forward(q_n_next, 'matrix')
 
-        req.ik_request.pose_stamped.header.frame_id = "world"
-        req.ik_request.pose_stamped.header.stamp = rospy.Time.now()
-        req.ik_request.pose_stamped.pose = pose_quat
+            delta_t = t_n_next[:3, 3] - t_n[:3, 3]
+            jacobian[:3, i] = delta_t / delta_q
 
-        req.ik_request.robot_state = self.robot_cmd.get_current_state()
+            delta_o = np.array(tft.euler_from_matrix(np.dot(t_n_next[:3, :3],
+                                                            np.transpose(t_n[:3, :3]))))
+            jacobian[3:, i] = delta_o / delta_q
 
-        res = self.ik_solver.call(req)
-        if res.error_code.val != 1:
-            rospy.logerr("IK error, code is %d" % res.error_code.val)
-            return None
-
-        joints = res.solution.joint_state.position
-        return joints
+        return jacobian
 
 
 def pose2pose(pose: Pose):

@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
     ad_control = AdmittanceControl(mode=3)
     ad_control.set_callback(callback)
-    ad_control.start()
+    # ad_control.start()
 
     task.run()
