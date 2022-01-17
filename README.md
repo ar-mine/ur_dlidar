@@ -30,3 +30,16 @@ $ catkin build
 # activate the workspace (ie: source it)
 $ source devel/setup.bash
 ```
+## TO DO
+1. Add all direction for force
+2. Reprodce the project
+    ```
+    Merge gazebo and real robot into one
+
+    Singularity check
+
+    Python package installation and index
+    ```
+
+3. Add trajectory following admittance controll
+4. Update user manual
