@@ -9,8 +9,8 @@ from moveit_msgs.srv import GetPositionIK, GetPositionIKRequest
 from helper_func import *
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from trajectory_msgs.msg import JointTrajectoryPoint
-from ur_ikfast import ur_kinematics
-
+from ur3e_kinematic import ur3e_fk
+from copy import copy
 
 JOINT_NAMES = [
     "shoulder_pan_joint",
@@ -32,8 +32,8 @@ class AdmittanceControl(MoveGroup):
 
         # The parameters of AdmittanceControl, which should be tuned
         self.M = np.eye(6)*0.5
-        self.B = np.eye(6)*2.0
-        self.K = np.eye(6)*1.5
+        self.B = np.eye(6)*3.0
+        self.K = np.eye(6)*1.0
 
         # Desired states
         self.x_d = np.zeros((6,))
@@ -58,7 +58,7 @@ class AdmittanceControl(MoveGroup):
 
         # Subscriber
         rospy.Subscriber("/joint_states", JointState, self._states_update_cb, queue_size=1)
-        self.ur_kinematics = ur_kinematics.URKinematics('ur3e')
+        self.ur_solver = ur3e_fk()
 
         if mode == 1:
             self.switch_controller("joint_group_pos_controller")
@@ -74,11 +74,12 @@ class AdmittanceControl(MoveGroup):
         rospy.sleep(2)
 
     def run(self):
-        self.x_d = self.x_n
+        self.x_d = np.copy(self.x_n)
         joints = Float64MultiArray()
         self.rate = rospy.Rate(self.freq)
         while not self.done:
             with self.lock:
+                q_n = np.copy(self.q_n)
                 x_e_dot = self.x_n_dot - self.x_d_dot
                 x_e = poseOperation(self.x_n, self.x_d, mode=2)
             x_e_dot_dot = np.dot(np.linalg.inv(self.M),
@@ -88,15 +89,19 @@ class AdmittanceControl(MoveGroup):
             x_e_next = poseOperation(x_e_dot_next/self.freq, x_e, mode=1)
             x_n_next = poseOperation(x_e_next, self.x_d, mode=1)
 
-            q_n_next = self.ur_kinematics.inverse(x_n_next)
+            q_n_next = self.ur_solver.inverse(x_n_next, q_n, 'rpy')
             if isinstance(q_n_next, type(None)):
                 rospy.loginfo("No solution")
+                continue
+            if any(abs(q_n_next - q_n) > 0.2):
+                rospy.loginfo("Error inverse kinematics")
                 continue
 
             if self.mode == 1:
                 joints.data = q_n_next
+                self.controller_client.publish(joints)
             elif self.mode == 2:
-                q_n_dot_next = (q_n_next - self.q_n)*self.freq
+                q_n_dot_next = (q_n_next - q_n)*self.freq
                 joints.data = q_n_dot_next
                 self.controller_client.publish(joints)
             elif self.mode == 3:
@@ -124,9 +129,12 @@ class AdmittanceControl(MoveGroup):
                 # Position
                 _position = msg.position
                 self.q_n[:] = [_position[2], _position[1], _position[0], *_position[3:]]
-                _x_n = self.ur_kinematics.forward(self.q_n)
-                self.x_n[:] = [*_x_n[:3], *tft.euler_from_quaternion(_x_n[3:])]
+                _x_n = self.ur_solver.forward(self.q_n, "rpy")
+                self.x_n[:] = _x_n
 
+                q_n_test = self.ur_solver.inverse(_x_n, self.q_n, 'rpy')
+                # if (abs(q_n_test - self.q_n) > 1e-4).any:
+                #     rospy.loginfo("Error inverse kinematics")
                 # Jacobian
                 self.jacobian[:] = self._compute_jacobian()
 
@@ -139,15 +147,14 @@ class AdmittanceControl(MoveGroup):
         self.callback = callback
 
     def _compute_jacobian(self, delta=0.05):
-        t_n = self.ur_kinematics.forward(self.q_n, 'matrix')
+        t_n = self.ur_solver.forward(self.q_n, 'matrix')
         delta_q = delta/180*np.pi
-        q_n_delta = self.q_n + delta_q
 
         jacobian = np.zeros((6, 6))
         for i in range(6):
-            q_n_next = self.q_n
-            q_n_next[i] = q_n_delta[i]
-            t_n_next = self.ur_kinematics.forward(q_n_next, 'matrix')
+            _q_n_next = np.copy(self.q_n)
+            _q_n_next[i] += delta_q
+            t_n_next = self.ur_solver.forward(_q_n_next, 'matrix')
 
             delta_t = t_n_next[:3, 3] - t_n[:3, 3]
             jacobian[:3, i] = delta_t / delta_q

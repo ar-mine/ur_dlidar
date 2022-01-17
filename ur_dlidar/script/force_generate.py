@@ -98,14 +98,14 @@ class ProximityForce:
 
 
 def callback():
-    ad_control.F_e[0] = task.force
+    ad_control.F_e[0] = -task.force
 
 
 if __name__ == "__main__":
     task = ProximityForce("ProximityForce", True)
 
-    ad_control = AdmittanceControl(mode=3)
+    ad_control = AdmittanceControl(mode=2)
     ad_control.set_callback(callback)
-    # ad_control.start()
+    ad_control.start()
 
     task.run()

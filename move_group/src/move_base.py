@@ -142,6 +142,10 @@ class MoveGroup(Thread):
 
     def stop(self):
         self.done = True
+        if self.mode == 2:
+            joints = Float64MultiArray()
+            joints.data = [0, 0, 0, 0, 0, 0]
+            self.controller_client.publish(joints)
         self.move_group_cmd.stop()
 
     def set_targets(self, goal):
