@@ -21,6 +21,7 @@ class ProximityForce:
         self.force = 0
         self.rate = None
         self.viz_flag = viz_flag
+        self.dlidar_name = "world"
 
         rospy.init_node(node)
         # Listener
@@ -50,13 +51,13 @@ class ProximityForce:
             min_cls = distance[min_idx]
             if min_cls < self.max_d:
                 self.force = 1 - (min_cls-self.min_d) / (self.max_d-self.min_d)
-                dlidar_name = "dlidar"+str(min_idx)
+                self.dlidar_name = "dlidar"+str(min_idx)
                 # position, orientation = self.tf_listener.lookupTransform("world", vobj.link_name, time=rospy.Time(0))
             else:
-                dlidar_name = "world"
+                self.dlidar_name = "world"
                 self.force = 0
             if self.viz_flag:
-                self._force_viz(dlidar_name)
+                self._force_viz(self.dlidar_name)
             self.rate.sleep()
 
     def _distance_cb(self, msg):
@@ -98,7 +99,9 @@ class ProximityForce:
 
 
 def callback():
-    ad_control.F_e[0] = -task.force
+    if not task.dlidar_name == "world":
+        p, _ = task.tf_listener.lookupTransform("base", task.dlidar_name, time=rospy.Time(0))
+        ad_control.F_e[0] = -task.force
 
 
 if __name__ == "__main__":
@@ -106,6 +109,6 @@ if __name__ == "__main__":
 
     ad_control = AdmittanceControl(mode=2)
     ad_control.set_callback(callback)
-    ad_control.start()
+    # ad_control.start()
 
     task.run()

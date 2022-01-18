@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>move_group</name>
+  <name>ur_control</name>
   <version>0.0.0</version>
-  <description>Python interfaces to MoveGroup of UR robot arm</description>
+  <description>Python interfaces to control UR robot arm</description>
 
   <author email="tanr0041@e.ntu.edu.sg">Armine</author>
 
