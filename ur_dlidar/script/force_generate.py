@@ -6,8 +6,7 @@ import threading
 from visualization_msgs.msg import Marker, MarkerArray
 import tf
 from geometry_msgs.msg import Pose, Point
-from copy import deepcopy
-from admittance_control import AdmittanceControl
+from ur_control import AdmittanceControl
 
 
 class ProximityForce:
@@ -99,16 +98,15 @@ class ProximityForce:
 
 
 def callback():
-    if not task.dlidar_name == "world":
-        p, _ = task.tf_listener.lookupTransform("base", task.dlidar_name, time=rospy.Time(0))
-        ad_control.F_e[0] = -task.force
+    # if not task.dlidar_name == "world":
+    #     p, _ = task.tf_listener.lookupTransform("base", task.dlidar_name, time=rospy.Time(0))
+    ad_control.F_e[0] = -task.force
 
 
 if __name__ == "__main__":
     task = ProximityForce("ProximityForce", True)
 
-    ad_control = AdmittanceControl(mode=2)
+    ad_control = AdmittanceControl(mode=4)
     ad_control.set_callback(callback)
-    # ad_control.start()
-
+    ad_control.start()
     task.run()

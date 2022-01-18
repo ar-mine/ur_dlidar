@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.3)
-project(move_group)
+project(ur_control)
 
 find_package(catkin REQUIRED
 COMPONENTS

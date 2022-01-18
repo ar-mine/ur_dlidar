@@ -7,10 +7,9 @@ import urdf_parser_py.urdf
 import tf
 import tf.transformations as tft
 import numpy as np
-from helper_func import *
+from ur_control.helper_func import *
 from threading import Thread
 import fcl
-import trimesh
 from fcl_visualization import Fcl_viz
 import copy
 

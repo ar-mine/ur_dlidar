@@ -5,7 +5,7 @@ import os
 from trac_ik_python.trac_ik import IK
 
 
-class ur3e_fk:
+class ur3e_kinematics:
     def __init__(self):
         path = os.path.split(os.path.realpath(__file__))[0]
         parse = ""
@@ -60,7 +60,7 @@ class ur3e_fk:
 
 
 def fk_test():
-    fk_solver = ur3e_fk()
+    fk_solver = ur3e_kinematics()
     print(fk_solver.forward([0.1630, -1.8588, -1.0072, -1.7438, 1.5692, 3.5175]))
     print(fk_solver.forward([0.1630, -1.8588, -1.0072, -1.7438, 1.5692, 3.5175], "quat"))
     print(fk_solver.forward([0.1630, -1.8588, -1.0072, -1.7438, 1.5692, 3.5175], "rpy"))

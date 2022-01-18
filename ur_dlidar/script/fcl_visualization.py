@@ -5,7 +5,7 @@ from urdf_parser_py.urdf import URDF
 import urdf_parser_py.urdf
 import tf.transformations as tft
 import numpy as np
-from helper_func import *
+from ur_control.helper_func import *
 import fcl
 import trimesh
 

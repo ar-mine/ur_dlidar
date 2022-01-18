@@ -1,5 +1,7 @@
 from std_msgs.msg import ColorRGBA
 from geometry_msgs.msg import Pose
+import numpy as np
+import tf.transformations as tft
 
 
 def getColor(color: str, alpha=1.0):
@@ -132,3 +134,23 @@ def normalizeQuaternion(quaternion):
     quaternion_msg[2] *= s
     quaternion_msg[3] *= s
     return quaternion_msg
+
+
+def poseOperation(pose1, pose2, mode):
+    pose = np.zeros((6,))
+
+    position1 = pose1[:3]
+    orientation1 = tft.euler_matrix(*pose1[3:])
+    position2 = pose2[:3]
+    orientation2 = tft.euler_matrix(*pose2[3:])
+
+    if mode == 1:
+        pose[:3] = position1 + position2
+        pose[3:] = tft.euler_from_matrix(np.dot(orientation1,
+                                                orientation2))
+
+    elif mode == 2:
+        pose[:3] = position1 - position2
+        pose[3:] = tft.euler_from_matrix(np.dot(orientation1,
+                                         np.transpose(orientation2)))
+    return pose
