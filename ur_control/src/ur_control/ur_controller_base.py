@@ -23,7 +23,7 @@ SUPPORT_LIST = ('ur3e',)
 
 
 class UR_ControlBase(Thread):
-    def __init__(self, version: str, freq: float):
+    def __init__(self, prefix: str, version: str, freq: float):
         super(UR_ControlBase, self).__init__()
         """
             A basic class provides real-time joint position, velocity and jacobin matrix.
@@ -240,3 +240,13 @@ class UR_ControlBase(Thread):
                 self.q_n_dot[:] = [_velocity[2], _velocity[1], _velocity[0], *_velocity[3:]]
                 self.x_n_dot[:] = np.dot(self.jacobin, self.q_n_dot)
                 self.rate.sleep()
+
+
+# Test
+if __name__ == "__main__":
+    node_name = "test"
+    rospy.init_node(node_name)
+
+    force_thread = UR_ControlBase(node_name, 'ur3e', freq=50)
+
+    force_thread.start()

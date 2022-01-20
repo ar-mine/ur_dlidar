@@ -93,3 +93,13 @@ class ProximityForce(Thread):
 
         markers.markers.append(marker)
         self.viz_pub.publish(markers)
+
+
+# Test
+if __name__ == "__main__":
+    node_name = "test"
+    rospy.init_node(node_name)
+
+    force_thread = ProximityForce(node_name, viz_flag=True)
+
+    force_thread.start()
