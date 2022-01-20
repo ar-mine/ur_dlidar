@@ -10,7 +10,7 @@ from std_msgs.msg import Float64MultiArray
 from ur_msgs.srv import SetSpeedSliderFraction
 from controller_manager_msgs.srv import SwitchControllerRequest, SwitchController
 from controller_manager_msgs.srv import LoadControllerRequest, LoadController
-from controller_manager_msgs.srv import ListControllersRequest, ListControllers
+from controller_manager_msgs.srv import ListControllers
 import actionlib
 from trajectory_msgs.msg import JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
@@ -19,14 +19,14 @@ from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryG
 from .ur3e_kinematic import ur3e_kinematics
 
 
-SUPPORT_LIST = ['ur3e']
+SUPPORT_LIST = ('ur3e',)
 
 
 class UR_ControlBase(Thread):
-    def __init__(self, version: str):
+    def __init__(self, version: str, freq: float):
         super(UR_ControlBase, self).__init__()
         """
-            A basic class provides real-time joint position, velocity and jacobian matrix.
+            A basic class provides real-time joint position, velocity and jacobin matrix.
         """
         # Class flag
         # Thread flag, false for running, true for finished
@@ -71,29 +71,29 @@ class UR_ControlBase(Thread):
         self.lock = RLock()
 
         # Class constant
-        self.joint_names = [
+        self.joint_names = (
             "shoulder_pan_joint",
             "shoulder_lift_joint",
             "elbow_joint",
             "wrist_1_joint",
             "wrist_2_joint",
             "wrist_3_joint",
-        ]
-        self.controller_switch_names = [
+        )
+        self.controller_switch_names = (
             "scaled_pos_joint_traj_controller",
             "pos_joint_traj_controller",
             "joint_group_pos_controller",
             "joint_group_vel_controller"
-        ]
+        )
 
         # Class variable parameters
         # Current states
-        self.x_n = np.zeros((6,))
-        self.x_n_dot = np.zeros((6,))
-        self.q_n = np.zeros((6,))
-        self.q_n_dot = np.zeros((6,))
+        self.x_n = np.zeros((6,), dtype=np.float)
+        self.x_n_dot = np.zeros((6,), dtype=np.float)
+        self.q_n = np.zeros((6,), dtype=np.float)
+        self.q_n_dot = np.zeros((6,), dtype=np.float)
         # Jacobin matrix
-        self.jacobin = np.zeros((6, 6))
+        self.jacobin = np.zeros((6, 6), dtype=np.float)
 
         # 0 for no group, 1 for pos group, 2 for vel group
         self.controller_mode = 0
@@ -101,6 +101,7 @@ class UR_ControlBase(Thread):
 
         # Delay 2s to keep the initialization above stable
         rospy.sleep(2)
+        self.rate = rospy.Rate(freq)
 
     def run(self):
         pass
@@ -133,7 +134,7 @@ class UR_ControlBase(Thread):
                     self.load_controller_srv(srv)
 
                 # Stop the controller that can conflict
-                stop_list = self.controller_switch_names.copy()
+                stop_list = list(self.controller_switch_names)
                 stop_list.remove(controller)
                 srv = SwitchControllerRequest()
                 srv.stop_controllers = stop_list
@@ -176,7 +177,7 @@ class UR_ControlBase(Thread):
             self.controller_client.publish(goal_point)
 
     # private:
-    def _compute_jacobian(self, delta=0.05):
+    def _compute_jacobin(self, delta=0.05):
         """
             Compute the jacobin matrix by adding a tiny translation
         """
@@ -232,9 +233,10 @@ class UR_ControlBase(Thread):
                 self.x_n[:] = _x_n
 
                 # Jacobin matrix
-                self.jacobin[:] = self._compute_jacobian()
+                self.jacobin[:] = self._compute_jacobin()
 
                 # Velocity
                 _velocity = msg.velocity
                 self.q_n_dot[:] = [_velocity[2], _velocity[1], _velocity[0], *_velocity[3:]]
                 self.x_n_dot[:] = np.dot(self.jacobin, self.q_n_dot)
+                self.rate.sleep()

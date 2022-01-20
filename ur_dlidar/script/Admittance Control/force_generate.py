@@ -2,18 +2,18 @@ import rospy
 from sensor_msgs.msg import Range
 from std_msgs.msg import Int8MultiArray
 import numpy as np
-import threading
+from threading import Thread, RLock
 from visualization_msgs.msg import Marker, MarkerArray
 import tf
 from geometry_msgs.msg import Pose, Point
-from ur_control import AdmittanceControl
 
 
-class ProximityForce:
-    def __init__(self, node: str, viz_flag):
+class ProximityForce(Thread):
+    def __init__(self, prefix: str, viz_flag: bool):
+        super(ProximityForce, self).__init__()
         self.distance = np.zeros((8,))
         self.mask = np.zeros((8,))
-        self.lock = threading.RLock()
+        self.lock = RLock()
         self.max_d = 0.55
         self.min_d = 0.05
         self.stop = False
@@ -22,13 +22,12 @@ class ProximityForce:
         self.viz_flag = viz_flag
         self.dlidar_name = "world"
 
-        rospy.init_node(node)
         # Listener
         rospy.Subscriber("dlidar_data", Range, self._distance_cb, queue_size=1)
         rospy.Subscriber("fcl/mask_pub", Int8MultiArray, self._mask_cb, queue_size=1)
         # Publisher
         if viz_flag:
-            self.viz_pub = rospy.Publisher(node+"/viz_pub", MarkerArray, queue_size=1)
+            self.viz_pub = rospy.Publisher(prefix+"/viz_pub", MarkerArray, queue_size=1)
         # TF listener
         self.tf_listener = tf.TransformListener()
 
@@ -51,7 +50,6 @@ class ProximityForce:
             if min_cls < self.max_d:
                 self.force = 1 - (min_cls-self.min_d) / (self.max_d-self.min_d)
                 self.dlidar_name = "dlidar"+str(min_idx)
-                # position, orientation = self.tf_listener.lookupTransform("world", vobj.link_name, time=rospy.Time(0))
             else:
                 self.dlidar_name = "world"
                 self.force = 0
@@ -95,18 +93,3 @@ class ProximityForce:
 
         markers.markers.append(marker)
         self.viz_pub.publish(markers)
-
-
-def callback():
-    # if not task.dlidar_name == "world":
-    #     p, _ = task.tf_listener.lookupTransform("base", task.dlidar_name, time=rospy.Time(0))
-    ad_control.F_e[0] = -task.force
-
-
-if __name__ == "__main__":
-    task = ProximityForce("ProximityForce", True)
-
-    ad_control = AdmittanceControl(mode=4)
-    ad_control.set_callback(callback)
-    ad_control.start()
-    task.run()

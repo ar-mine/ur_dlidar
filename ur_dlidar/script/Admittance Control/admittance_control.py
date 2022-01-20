@@ -1,13 +1,13 @@
 import numpy as np
 import rospy
 from std_msgs.msg import Float64, Float64MultiArray
-from .helper_func import *
-from .ur_controller_base import UR_ControlBase
+from ur_control.helper_func import *
+from ur_control.ur_controller_base import UR_ControlBase
 
 
 class AdmittanceControl(UR_ControlBase):
-    def __init__(self, mode):
-        super(AdmittanceControl, self).__init__("ur3e")
+    def __init__(self, prefix: str, mode: int):
+        super(AdmittanceControl, self).__init__("ur3e", freq=60)
         # mode 1 for position, mode 2 for velocity， mode 3 for trajectory
         self.mode = mode
 
@@ -24,7 +24,6 @@ class AdmittanceControl(UR_ControlBase):
         self.F_e = np.zeros((6,))
 
         # Work parameter
-        self.rate = None
         self.freq = 30
 
         # Callback
@@ -43,12 +42,12 @@ class AdmittanceControl(UR_ControlBase):
         self.done = False
         # Sleep to make system stable
         rospy.sleep(2)
+        self.x_d = np.copy(self.x_n)
 
     def run(self):
         # Assume start point is target point
-        self.x_d = np.copy(self.x_n)
         joints = Float64MultiArray()
-        self.rate = rospy.Rate(self.freq)
+        rate = rospy.Rate(self.freq)
 
         while not self.done:
             with self.lock:
@@ -75,8 +74,8 @@ class AdmittanceControl(UR_ControlBase):
 
             if self.mode == 1 or self.mode == 2:
                 # Create and fill trajectory goal
-                if self.rate.remaining().to_sec() > 0:
-                    self.move_command(q_n_next, self.rate.remaining())
+                if rate.remaining().to_sec() > 0:
+                    self.move_command(q_n_next, rate.remaining())
             if self.mode == 3:
                 joints.data = q_n_next
                 self.move_command(joints)
@@ -88,12 +87,8 @@ class AdmittanceControl(UR_ControlBase):
             if self.callback is not None:
                 self.callback()
 
-            # print(self.rate.remaining())
-            self.rate.sleep()
+            # print(rate.remaining())
+            rate.sleep()
 
     def set_callback(self, callback):
         self.callback = callback
-
-
-
-

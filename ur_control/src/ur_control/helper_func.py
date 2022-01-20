@@ -4,7 +4,7 @@ import numpy as np
 import tf.transformations as tft
 
 
-def getColor(color: str, alpha=1.0):
+def getColor(color: str, alpha: float = 1.0):
     result = ColorRGBA()
 
     if color == "RED":
@@ -136,7 +136,7 @@ def normalizeQuaternion(quaternion):
     return quaternion_msg
 
 
-def poseOperation(pose1, pose2, mode):
+def poseOperation(pose1, pose2, mode: int):
     pose = np.zeros((6,))
 
     position1 = pose1[:3]

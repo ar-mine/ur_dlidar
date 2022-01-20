@@ -15,14 +15,14 @@ class ur3e_kinematics:
                 assert "The fk_expression should be 12 lines, but it has {} lines now.".format(len(lines))
             for i, line in enumerate(lines):
                 if i == 0:
-                    parse += "["
+                    parse += "("
                 if i % 4 == 0:
-                    parse += "["
+                    parse += "("
                 parse += line[:-1]+","
                 if i % 4 == 3:
-                    parse += "],"
+                    parse += "),"
                 if i == 11:
-                    parse += "]"
+                    parse += ")"
 
         with open(path + "/ur3e.urdf") as f:
             urdf = f.read()
@@ -59,7 +59,7 @@ class ur3e_kinematics:
             raise "Not support output type, only quat and rpy are supported!"
 
 
-def fk_test():
+def ur3e_kinematics_test():
     fk_solver = ur3e_kinematics()
     print(fk_solver.forward([0.1630, -1.8588, -1.0072, -1.7438, 1.5692, 3.5175]))
     print(fk_solver.forward([0.1630, -1.8588, -1.0072, -1.7438, 1.5692, 3.5175], "quat"))
@@ -69,4 +69,4 @@ def fk_test():
 
 
 if __name__ == "__main__":
-    fk_test()
+    ur3e_kinematics_test()
