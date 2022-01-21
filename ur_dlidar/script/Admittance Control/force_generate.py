@@ -23,7 +23,8 @@ class ProximityForce(Thread):
         self.dlidar_name = "world"
 
         # Listener
-        rospy.Subscriber("dlidar_data", Range, self._distance_cb, queue_size=1)
+        for i in range(8):
+            rospy.Subscriber("dlidar_data"+str(i), Range, self._distance_cb, callback_args=i, queue_size=1)
         rospy.Subscriber("fcl/mask_pub", Int8MultiArray, self._mask_cb, queue_size=1)
         # Publisher
         if viz_flag:
@@ -57,10 +58,10 @@ class ProximityForce(Thread):
                 self._force_viz(self.dlidar_name)
             self.rate.sleep()
 
-    def _distance_cb(self, msg):
+    def _distance_cb(self, msg, index):
         with self.lock:
-            idx = int(msg.header.frame_id[-1])
-            self.distance[idx] = msg.range
+            # idx = int(msg.header.frame_id[-1])
+            self.distance[index] = msg.range
 
     def _mask_cb(self, msg):
         with self.lock:

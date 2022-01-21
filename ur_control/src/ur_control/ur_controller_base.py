@@ -16,7 +16,7 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 
 # Custom
-from .ur3e_kinematic import ur3e_kinematics
+from ur_control import ur3e_kinematics
 
 
 SUPPORT_LIST = ('ur3e',)
@@ -88,12 +88,12 @@ class UR_ControlBase(Thread):
 
         # Class variable parameters
         # Current states
-        self.x_n = np.zeros((6,), dtype=np.float)
-        self.x_n_dot = np.zeros((6,), dtype=np.float)
-        self.q_n = np.zeros((6,), dtype=np.float)
-        self.q_n_dot = np.zeros((6,), dtype=np.float)
+        self.x_n = np.zeros((6,), dtype=np.float_)
+        self.x_n_dot = np.zeros((6,), dtype=np.float_)
+        self.q_n = np.zeros((6,), dtype=np.float_)
+        self.q_n_dot = np.zeros((6,), dtype=np.float_)
         # Jacobin matrix
-        self.jacobin = np.zeros((6, 6), dtype=np.float)
+        self.jacobin = np.zeros((6, 6), dtype=np.float_)
 
         # 0 for no group, 1 for pos group, 2 for vel group
         self.controller_mode = 0
@@ -104,7 +104,9 @@ class UR_ControlBase(Thread):
         self.rate = rospy.Rate(freq)
 
     def run(self):
-        pass
+        self.done = False
+        while not self.done:
+            pass
 
     def stop(self):
         self.done = True

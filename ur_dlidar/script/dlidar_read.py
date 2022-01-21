@@ -4,7 +4,8 @@ from sensor_msgs.msg import Range
 import numpy as np
 
 rospy.init_node("dlidar_read")
-dlidar_pub = rospy.Publisher("/dlidar_data", Range, queue_size=1)
+
+dlidar_pub = [None] * 8
 dlidar_msg = Range()
 dlidar_msg.max_range = 1.0
 dlidar_msg.min_range = 0.02
@@ -24,7 +25,6 @@ def on_shutdown():
     ser.close()
 
 
-rate = rospy.Rate(400)
 while not rospy.is_shutdown():
     data = ser.readline().decode().strip()
 
@@ -37,10 +37,9 @@ while not rospy.is_shutdown():
         dlidar_msg.header.frame_id = 'dlidar{}'.format(i)
         if dis > 1000.0 or dis == 0:
             dis = 1000
-        dlidar_msg.range = dis/1000.0
+        dlidar_msg.range = dis / 1000.0
         dlidar_msg.header.stamp = rospy.Time.now()
+        if dlidar_pub[i] is None:
+            dlidar_pub[i] = rospy.Publisher('/dlidar_data'+str(i), Range, queue_size=1)
 
-        dlidar_pub.publish(dlidar_msg)
-        rate.sleep()
-
-
+        dlidar_pub[i].publish(dlidar_msg)

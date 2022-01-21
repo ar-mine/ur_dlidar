@@ -26,7 +26,7 @@ if __name__ == "__main__":
     rospy.init_node(node_name)
 
     force_thread = ProximityForce(node_name, viz_flag=True)
-    ad_control_thread = AdmittanceControl(node_name, mode=4)
+    ad_control_thread = AdmittanceControl(node_name, mode=1)
 
     ad_control_thread.set_callback(callback)
 
